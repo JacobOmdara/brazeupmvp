@@ -3,7 +3,7 @@ import numpy as np
 from PIL import Image
 from huggingface_hub import hf_hub_download
 import io
-from model import UNet
+from backend.model import UNet
 # utilizing pytorch (what Awais used) n downloading models from HuggingFace
 
 MODEL = None  # placeholder for model
@@ -56,7 +56,7 @@ def predict_defects(image_file):  #
     Run ML interference on uploaded img
 
     Arguments:
-        image_file: which is a FileStorage obj from Flask rq
+        image_bytes: raw bytes of uploaded img
     Returns:
         List of detected defects w bounding boxes
     """
@@ -64,8 +64,7 @@ def predict_defects(image_file):  #
 
     # reading the upload
 
-    image_bytes = image_file.read()
-    image = Image.open(io.BytesIO(image_bytes)).convert("RGB")
+    image = Image.open(io.BytesIO(image_file)).convert("RGB")
     original_size = image.size
 
     # preprocess resize to what model expects
