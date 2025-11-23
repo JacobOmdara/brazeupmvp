@@ -51,7 +51,7 @@ def load_model():  # getting model HuggingFace
         print(f"Model loaded successfully on {DEVICE}")
 
 
-def predict_defects(image_file):  #
+def predict_defects(image_bytes):  #
     """
     Run ML interference on uploaded img
 
@@ -64,7 +64,7 @@ def predict_defects(image_file):  #
 
     # reading the upload
 
-    image = Image.open(io.BytesIO(image_file)).convert("RGB")
+    image = Image.open(io.BytesIO(image_bytes)).convert("RGB")
     original_size = image.size
 
     # preprocess resize to what model expects
