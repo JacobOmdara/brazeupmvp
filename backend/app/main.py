@@ -1,8 +1,10 @@
+import os
 from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 
-from app.routers import photo_upload, qa_pack, inspection
+from app.routers import photo_upload, qa_pack, inspection, case_management
 
 app = FastAPI(title="Braze Up MVP", version="1.0.0")
 
@@ -19,6 +21,7 @@ app.add_middleware(
 app.include_router(qa_pack.router, prefix="/api/v1", tags=["QA-pack ZIP Bundler"])
 app.include_router(photo_upload.router, prefix="/api/v1", tags=["upload"])
 app.include_router(inspection.router, prefix="/api", tags=["inspection"])
+app.include_router(case_management.router, prefix="/api", tags=["cases"])
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -38,3 +41,24 @@ async def serve_form():
 async def health():
     """Health check endpoint"""
     return {"message": "Status OK!"}
+
+
+@app.get("/uploads/{case_id}/{filename}")
+async def get_photo(case_id: str, filename: str):
+    """Serve uploaded photos"""
+    file_path = f"uploads/{case_id}/{filename}"
+    if os.path.exists(file_path):
+        return FileResponse(file_path)
+    raise HTTPException(status_code=404, detail="Photo not found")
+
+@app.get("/dashboard", response_class=HTMLResponse)
+async def serve_dashboard():
+    """Serve the case management dashboard"""
+    try:
+        with open("static/dashboard.html", "r") as f:
+            return f.read()
+    except FileNotFoundError:
+        return HTMLResponse(
+            content="<h1>Dashboard not found</h1>",
+            status_code=404
+        )
