@@ -49,7 +49,7 @@ async def get_photo(case_id: str, filename: str):
     file_path = f"uploads/{case_id}/{filename}"
     if os.path.exists(file_path):
         return FileResponse(file_path)
-    raise HTTPException(status_code=404, detail="Photo not found")
+    raise Exception(status_code=404, detail="Photo not found")
 
 @app.get("/dashboard", response_class=HTMLResponse)
 async def serve_dashboard():
@@ -62,3 +62,25 @@ async def serve_dashboard():
             content="<h1>Dashboard not found</h1>",
             status_code=404
         )
+    
+
+@app.get("/photo-viewer", response_class=HTMLResponse)
+async def serve_photo_viewer():
+    """Serve the photo viewer with mask overlay"""
+    try:
+        with open("static/photo-viewer.html", "r") as f:
+            return f.read()
+    except FileNotFoundError:
+        return HTMLResponse(
+            content="<h1>Photo viewer not found</h1>",
+            status_code=404
+        )
+    
+@app.get("/masks/{case_id}/{filename}")
+async def get_mask(case_id: str, filename: str):
+    """Serve segmentation masks"""
+    # Assuming masks are stored in uploads/{case_id}/masks/
+    file_path = f"uploads/{case_id}/masks/{filename}"
+    if os.path.exists(file_path):
+        return FileResponse(file_path)
+    raise Exception(status_code=404, detail="Mask not found")

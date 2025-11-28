@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Mask Overlay Viewer - BrazeUP</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: #fafafa;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .viewer-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 50px 40px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .header-label {
+            font-size: 11px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #7a8f6a;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        .header h1 {
+            font-size: 36px;
+            font-weight: 600;
+            color: #1a2332;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 16px;
+        }
+
+        .upload-section {
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .upload-section h3 {
+            color: #1a2332;
+            margin-bottom: 25px;
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .file-input-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .file-input-wrapper label {
+            display: block;
+            margin-bottom: 10px;
+            font-size: 14px;
+            color: #666;
+            font-weight: 500;
+        }
+
+        input[type="file"] {
+            width: 100%;
+            padding: 12px;
+            background: #f9f9f9;
+            border: 2px solid #e8e8e8;
+            border-radius: 6px;
+            color: #333;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        input[type="file"]:hover {
+            border-color: #7a8f6a;
+        }
+
+        input[type="file"]::-webkit-file-upload-button {
+            background: #7a8f6a;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 4px;
+            color: white;
+            cursor: pointer;
+            margin-right: 15px;
+            font-weight: 500;
+            transition: background 0.3s ease;
+        }
+
+        input[type="file"]::-webkit-file-upload-button:hover {
+            background: #6a7f5a;
+        }
+
+        .controls {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .control-group label {
+            font-size: 12px;
+            color: #666;
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        input[type="range"] {
+            width: 200px;
+            accent-color: #7a8f6a;
+        }
+
+        select {
+            padding: 10px 15px;
+            background: #f9f9f9;
+            border: 2px solid #e8e8e8;
+            border-radius: 6px;
+            color: #333;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        select:hover {
+            border-color: #7a8f6a;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: #7a8f6a;
+            box-shadow: 0 0 0 3px rgba(122, 143, 106, 0.1);
+        }
+
+        .toggle-btn {
+            padding: 12px 24px;
+            background: white;
+            border: 2px solid #e8e8e8;
+            border-radius: 6px;
+            color: #666;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .toggle-btn:hover {
+            border-color: #7a8f6a;
+            color: #7a8f6a;
+        }
+
+        .toggle-btn.active {
+            background: #7a8f6a;
+            color: white;
+            border-color: #7a8f6a;
+        }
+
+        .canvas-wrapper {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .canvas-container {
+            position: relative;
+            background: #000;
+            border-radius: 8px;
+            overflow: hidden;
+            display: none;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        canvas {
+            display: block;
+            max-width: 100%;
+            height: auto;
+        }
+
+        .measurements-overlay {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .measurement-item {
+            display: flex;
+            justify-content: space-between;
+            gap: 30px;
+            margin-bottom: 12px;
+        }
+
+        .measurement-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .measurement-label {
+            color: #666;
+            font-weight: 500;
+            text-transform: uppercase;
+            font-size: 11px;
+            letter-spacing: 0.5px;
+        }
+
+        .measurement-value {
+            font-weight: 600;
+            color: #1a2332;
+            font-size: 14px;
+        }
+
+        .defect-type-crack {
+            color: #e74c3c;
+        }
+
+        .defect-type-pit {
+            color: #3498db;
+        }
+
+        .legend {
+            background: white;
+            padding: 25px 30px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            display: flex;
+            gap: 40px;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .legend-color {
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+        }
+
+        .color-crack {
+            background: rgba(231, 76, 60, 0.5);
+        }
+
+        .color-pit {
+            background: rgba(52, 152, 219, 0.5);
+        }
+
+        .legend-item span {
+            color: #333;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .info-panel {
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            margin-top: 30px;
+        }
+
+        .info-panel h3 {
+            color: #1a2332;
+            margin-bottom: 25px;
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .info-item {
+            background: #f9f9f9;
+            padding: 25px;
+            border-radius: 6px;
+        }
+
+        .info-label {
+            font-size: 11px;
+            color: #7a8f6a;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        .info-value {
+            font-size: 20px;
+            font-weight: 600;
+            color: #1a2332;
+        }
+
+        @media (max-width: 768px) {
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .control-group {
+                width: 100%;
+            }
+
+            input[type="range"] {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="viewer-container">
+        <div class="header">
+            <div class="header-label">AI Detection</div>
+            <h1>Mask Overlay Viewer</h1>
+            <p>Upload photos and segmentation masks to visualize AI detections</p>
+        </div>
+
+        <div class="upload-section">
+            <h3>Upload Files</h3>
+            <div class="file-input-group">
+                <div class="file-input-wrapper">
+                    <label>Original Photo</label>
+                    <input type="file" id="photoInput" accept="image/*">
+                </div>
+                <div class="file-input-wrapper">
+                    <label>Segmentation Mask (PNG)</label>
+                    <input type="file" id="maskInput" accept="image/png">
+                </div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <div class="control-group">
+                <label>Mask Opacity</label>
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <input type="range" id="opacitySlider" min="0" max="100" value="40">
+                    <span id="opacityValue" style="font-weight: 600; color: #333; min-width: 50px;">40%</span>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label>Defect Type</label>
+                <select id="defectType">
+                    <option value="crack">Crack (Red)</option>
+                    <option value="pit">Pit (Blue)</option>
+                </select>
+            </div>
+
+            <button id="toggleMask" class="toggle-btn active">Hide Mask</button>
+            <button id="toggleMeasurements" class="toggle-btn active">Hide Measurements</button>
+        </div>
+
+        <div class="canvas-wrapper">
+            <div class="canvas-container" id="canvasContainer">
+                <canvas id="viewerCanvas"></canvas>
+                <div class="measurements-overlay" id="measurementsOverlay">
+                    <div class="measurement-item">
+                        <span class="measurement-label">Defect Type</span>
+                        <span class="measurement-value" id="defectTypeDisplay">Crack</span>
+                    </div>
+                    <div class="measurement-item">
+                        <span class="measurement-label">Gap</span>
+                        <span class="measurement-value" id="gapDisplay">2.5 mm</span>
+                    </div>
+                    <div class="measurement-item">
+                        <span class="measurement-label">Length</span>
+                        <span class="measurement-value" id="lengthDisplay">15.3 mm</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color color-crack"></div>
+                <span>Crack Detection</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color color-pit"></div>
+                <span>Pit Detection</span>
+            </div>
+        </div>
+
+        <div class="info-panel">
+            <h3>Image Information</h3>
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-label">Original Size</div>
+                    <div class="info-value" id="imageSize">-</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Mask Status</div>
+                    <div class="info-value" id="maskStatus">No mask loaded</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Detection Confidence</div>
+                    <div class="info-value" id="confidence">92%</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('viewerCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        let originalImage = null;
+        let maskImage = null;
+        let showMask = true;
+        let showMeasurements = true;
+        let maskOpacity = 0.4;
+        let defectType = 'crack';
+
+        let measurements = {
+            gap: 2.5,
+            length: 15.3,
+            defectType: 'crack'
+        };
+
+        document.getElementById('photoInput').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        originalImage = img;
+                        canvas.width = img.width;
+                        canvas.height = img.height;
+                        document.getElementById('canvasContainer').style.display = 'block';
+                        document.getElementById('imageSize').textContent = `${img.width} x ${img.height}px`;
+                        render();
+                    };
+                    img.src = event.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        document.getElementById('maskInput').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        maskImage = img;
+                        document.getElementById('maskStatus').textContent = 'Mask loaded';
+                        render();
+                    };
+                    img.src = event.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        document.getElementById('opacitySlider').addEventListener('input', (e) => {
+            maskOpacity = e.target.value / 100;
+            document.getElementById('opacityValue').textContent = e.target.value + '%';
+            render();
+        });
+
+        document.getElementById('defectType').addEventListener('change', (e) => {
+            defectType = e.target.value;
+            measurements.defectType = defectType;
+            document.getElementById('defectTypeDisplay').textContent = 
+                defectType.charAt(0).toUpperCase() + defectType.slice(1);
+            render();
+        });
+
+        document.getElementById('toggleMask').addEventListener('click', (e) => {
+            showMask = !showMask;
+            e.target.textContent = showMask ? 'Hide Mask' : 'Show Mask';
+            e.target.classList.toggle('active');
+            render();
+        });
+
+        document.getElementById('toggleMeasurements').addEventListener('click', (e) => {
+            showMeasurements = !showMeasurements;
+            e.target.textContent = showMeasurements ? 'Hide Measurements' : 'Show Measurements';
+            e.target.classList.toggle('active');
+            document.getElementById('measurementsOverlay').style.display = 
+                showMeasurements ? 'block' : 'none';
+        });
+
+        function render() {
+            if (!originalImage) return;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(originalImage, 0, 0);
+
+            if (maskImage && showMask) {
+                ctx.globalAlpha = maskOpacity;
+                
+                if (defectType === 'crack') {
+                    ctx.globalCompositeOperation = 'multiply';
+                    ctx.fillStyle = '#ff0000';
+                } else if (defectType === 'pit') {
+                    ctx.globalCompositeOperation = 'multiply';
+                    ctx.fillStyle = '#0066ff';
+                }
+                
+                ctx.drawImage(maskImage, 0, 0, canvas.width, canvas.height);
+                ctx.globalCompositeOperation = 'source-over';
+                ctx.globalAlpha = 1.0;
+            }
+
+            updateMeasurements();
+        }
+
+        function updateMeasurements() {
+            document.getElementById('defectTypeDisplay').textContent = 
+                measurements.defectType.charAt(0).toUpperCase() + measurements.defectType.slice(1);
+            document.getElementById('gapDisplay').textContent = measurements.gap + ' mm';
+            document.getElementById('lengthDisplay').textContent = measurements.length + ' mm';
+            
+            const defectDisplay = document.getElementById('defectTypeDisplay');
+            defectDisplay.className = 'measurement-value defect-type-' + measurements.defectType;
+        }
+    </script>
+</body>
+</html>
