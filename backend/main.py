@@ -1,5 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+
+from routes.photo_upload import router as photo_upload_router
+from routes.qa_pack import router as qa_pack_router
 from routes.analyze import router as analyze_router
 # importing relevant tools
 
@@ -19,6 +22,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 app.include_router(analyze_router, prefix="/api") # registering analyze router
+app.include_router(qa_pack_router, prefix="/api", tags=["QA-pack ZIP Bundler"])  
+app.include_router(photo_upload_router, prefix="/api", tags=["upload"])  
 
 @app.get("/health")
 def health():
