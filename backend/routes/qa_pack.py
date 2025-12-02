@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from app.services.qa_pack import qa_pack_service
+from services.qa_pack import qa_pack_service
 router = APIRouter()
 
 

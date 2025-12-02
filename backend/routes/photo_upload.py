@@ -1,6 +1,6 @@
 from fastapi import APIRouter, UploadFile, File, HTTPException, status
 from typing import List
-from app.services.photo_upload import photo_service
+from services.photo_upload import photo_service
 
 router = APIRouter()
 

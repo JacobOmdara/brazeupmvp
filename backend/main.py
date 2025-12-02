@@ -4,7 +4,7 @@ from fastapi.responses import HTMLResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 
-from app.routers import photo_upload, qa_pack, inspection, case_management
+from routes import photo_upload, qa_pack, inspection, case_management
 
 app = FastAPI(title="Braze Up MVP", version="1.0.0")
 
@@ -16,6 +16,11 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+@app.get("/health_endpoint")
+async def health():
+    """Health check endpoint"""
+    return {"message": "Status OK!"}
 
 # Include routers
 app.include_router(qa_pack.router, prefix="/api/v1", tags=["QA-pack ZIP Bundler"])
@@ -37,10 +42,6 @@ async def serve_form():
         )
 
 
-@app.get("/health_endpoint")
-async def health():
-    """Health check endpoint"""
-    return {"message": "Status OK!"}
 
 
 @app.get("/uploads/{case_id}/{filename}")

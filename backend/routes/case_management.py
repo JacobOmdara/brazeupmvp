@@ -4,7 +4,7 @@ Router for case management endpoints
 from fastapi import APIRouter, HTTPException
 from typing import Optional
 
-from app.services.case_service import CaseService, CaseStatus
+from services.case_service import CaseService, CaseStatus
 
 router = APIRouter()
 case_service = CaseService()

@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Form, UploadFile, File, HTTPException, status
 from typing import List
-from app.services.inspection import InspectionService
+from services.inspection import InspectionService
 
 router = APIRouter()
 inspection_service = InspectionService()
