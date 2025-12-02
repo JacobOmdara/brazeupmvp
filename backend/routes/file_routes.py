@@ -1,40 +1,21 @@
-from fastapi import APIRouter
-from fastapi.responses import HTMLResponse
+import os
+from fastapi import APIRouter, HTTPException
+from fastapi.responses import FileResponse
 
 router = APIRouter()
 
-@router.get("/", response_class=HTMLResponse)
-async def serve_form():
-    """Serve the inspection form"""
-    try:
-        with open("static/form.html", "r") as f:
-            return f.read()
-    except FileNotFoundError:
-        return HTMLResponse(
-            content="<h1>Form not found</h1><p>Please create static/form.html</p>",
-            status_code=404
-        )
+@router.get("/uploads/{case_id}/{filename}")
+async def get_photo(case_id: str, filename: str):
+    """Serve uploaded photos"""
+    file_path = f"uploads/{case_id}/{filename}"
+    if os.path.exists(file_path):
+        return FileResponse(file_path)
+    raise HTTPException(status_code=404, detail="Photo not found")
 
-@router.get("/dashboard", response_class=HTMLResponse)
-async def serve_dashboard():
-    """Serve the case management dashboard"""
-    try:
-        with open("static/dashboard.html", "r") as f:
-            return f.read()
-    except FileNotFoundError:
-        return HTMLResponse(
-            content="<h1>Dashboard not found</h1>",
-            status_code=404
-        )
-
-@router.get("/photo-viewer", response_class=HTMLResponse)
-async def serve_photo_viewer():
-    """Serve the photo viewer with mask overlay"""
-    try:
-        with open("static/photo-viewer.html", "r") as f:
-            return f.read()
-    except FileNotFoundError:
-        return HTMLResponse(
-            content="<h1>Photo viewer not found</h1>",
-            status_code=404
-        )
+@router.get("/masks/{case_id}/{filename}")
+async def get_mask(case_id: str, filename: str):
+    """Serve segmentation masks"""
+    file_path = f"uploads/{case_id}/masks/{filename}"
+    if os.path.exists(file_path):
+        return FileResponse(file_path)
+    raise HTTPException(status_code=404, detail="Mask not found")
