@@ -719,7 +719,7 @@
                         photoDiv.className = 'photo-item';
                         photoDiv.innerHTML = `
                             <img src="${e.target.result}" alt="Photo">
-                            <button type="button" class="photo-remove" onclick="removePhoto(${uploadedPhotos.length - 1})">×</button>
+                            <button type="button" class="photo-remove" onclick="removePhoto(${uploadedPhotos.length - 1})">X</button>
                         `;
                         photoPreview.appendChild(photoDiv);
                         updatePhotoCount();
@@ -739,7 +739,7 @@
                     photoDiv.className = 'photo-item';
                     photoDiv.innerHTML = `
                         <img src="${e.target.result}" alt="Photo">
-                        <button type="button" class="photo-remove" onclick="removePhoto(${idx})">×</button>
+                        <button type="button" class="photo-remove" onclick="removePhoto(${idx})">X</button>
                     `;
                     photoPreview.appendChild(photoDiv);
                 };
