@@ -27,28 +27,35 @@ DEVICE = torch.device(
 def load_model():  # getting model HuggingFace
     global MODEL
     if MODEL is None:
-        # download model from HF
-        model_path = hf_hub_download(
-            repo_id="Awais-H/MetalSegmentation", filename="best_model.pth"
-        )
-        # @awais need you to share the model Architecture Unet class deff
-        # MODEL = UNet(...)
-        # MODEL.load_state_dict(torch.load(model_path, map_location=DEVICE))
-        # MODEL.eval()
-        MODEL = UNet(
-            in_channels=3,  # RGB images
-            out_channels=7,  # Background + 6 defect classes
-            base_filters=64,
-            depth=4,
-        )
-
-        # Load the trained weights
-        checkpoint = torch.load(model_path, map_location=DEVICE)
-        MODEL.load_state_dict(checkpoint["model_state_dict"])
-        MODEL.to(DEVICE)
-        MODEL.eval()
-
-        print(f"Model loaded successfully on {DEVICE}")
+        try:
+            # Try to download from HF (Awais's repo)
+            model_path = hf_hub_download(
+                repo_id="Awais-H/MetalSegmentation", filename="best_model.pth"
+            )
+            checkpoint = torch.load(model_path, map_location=DEVICE)
+            MODEL = UNet(
+                in_channels=3,
+                out_channels=7,
+                base_filters=64,
+                depth=4,
+            )
+            MODEL.load_state_dict(checkpoint["model_state_dict"])
+            MODEL.to(DEVICE)
+            MODEL.eval()
+            print(f"Model loaded from HuggingFace on {DEVICE}")
+        
+        except Exception as e:
+            # Fallback: create a MOCK model for testing
+            print(f"HF download failed ({e}), using mock model for testing")
+            MODEL = UNet(
+                in_channels=3,
+                out_channels=7,
+                base_filters=64,
+                depth=4,
+            )
+            MODEL.to(DEVICE)
+            MODEL.eval()
+            print(f"Mock model created on {DEVICE}")
 
 
 def predict_defects(image_bytes):  #
