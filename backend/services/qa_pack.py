@@ -27,12 +27,12 @@ class QAPackService:
             qa_packs_dir (Path): Directory where generated ZIP files will be stored
             max_zip_size (int): Maximum allowed ZIP file size in bytes (50 MB)
         """
-        self.images_dir = Path(r"C:\Users\talha\OneDrive\Desktop\Riippen\brazeupmvp\backend\app\tests\qa_test\images")
-        self.masks_dir = Path(r"C:\Users\talha\OneDrive\Desktop\Riippen\brazeupmvp\backend\app\tests\qa_test\segmentation_masks") 
-        self.geometry_csv = Path(r"C:\Users\talha\OneDrive\Desktop\Riippen\brazeupmvp\backend\app\tests\qa_test\geometry.csv")
-        self.summary_json = Path(r"C:\Users\talha\OneDrive\Desktop\Riippen\brazeupmvp\backend\app\tests\qa_test\summary.json")
-        self.job_ticket_pdf = Path(r"C:\Users\talha\OneDrive\Desktop\Riippen\brazeupmvp\backend\app\tests\qa_test\job_ticket.pdf")
-        self.qa_packs_dir = Path(r"C:\Users\talha\OneDrive\Desktop\Riippen\brazeupmvp\backend\app\tests\qa_test\qa_packs")
+        self.images_dir = Path("tests/qa_test/images")
+        self.masks_dir = Path("tests/qa_test/segmentation_masks")
+        self.geometry_csv = Path("tests/qa_test/geometry.csv")
+        self.summary_json = Path("tests/qa_test/summary.json")
+        self.job_ticket_pdf = Path("tests/qa_test/job_ticket.pdf")
+        self.qa_packs_dir = Path("tests/qa_test/qa_packs")
         self.max_zip_size = 50 * 1024 * 1024  # 50 MB
 
     def validate_paths(self) -> bool:
