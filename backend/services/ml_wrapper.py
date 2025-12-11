@@ -32,18 +32,21 @@ def load_model():  # getting model HuggingFace
             model_path = hf_hub_download(
                 repo_id="Awais-H/MetalSegmentation", filename="best_model.pth"
             )
-            checkpoint = torch.load(model_path, map_location=DEVICE)
+            checkpoint = torch.load(model_path, map_location=DEVICE, weights_only=False)
             MODEL = UNet(
                 in_channels=3,
                 out_channels=7,
                 base_filters=64,
                 depth=4,
             )
-            MODEL.load_state_dict(checkpoint["model_state_dict"])
+            if isinstance(checkpoint, dict) and "model_state_dict" in checkpoint:
+                MODEL.load_state_dict(checkpoint["model_state_dict"])
+            else:
+                MODEL.load_state_dict(checkpoint)
             MODEL.to(DEVICE)
             MODEL.eval()
             print(f"Model loaded from HuggingFace on {DEVICE}")
-        
+
         except Exception as e:
             # Fallback: create a MOCK model for testing
             print(f"HF download failed ({e}), using mock model for testing")
