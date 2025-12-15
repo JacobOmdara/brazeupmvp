@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Case Management Dashboard - BrazeUP</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: #fafafa;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 50px 40px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .header-label {
+            font-size: 11px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #7a8f6a;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        .header h1 {
+            font-size: 36px;
+            font-weight: 600;
+            color: #1a2332;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 16px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .stat-number {
+            font-size: 42px;
+            font-weight: 600;
+            color: #7a8f6a;
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 500;
+        }
+
+        .controls {
+            background: white;
+            padding: 25px 30px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .filter-btn {
+            padding: 10px 20px;
+            border: 2px solid #e8e8e8;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            font-weight: 500;
+            color: #666;
+        }
+
+        .filter-btn:hover {
+            border-color: #7a8f6a;
+            color: #7a8f6a;
+        }
+
+        .filter-btn.active {
+            background: #7a8f6a;
+            color: white;
+            border-color: #7a8f6a;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e8e8e8;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: #7a8f6a;
+            box-shadow: 0 0 0 3px rgba(122, 143, 106, 0.1);
+        }
+
+        .cases-table {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: #f9f9f9;
+        }
+
+        th {
+            padding: 18px 20px;
+            text-align: left;
+            font-weight: 600;
+            color: #333;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            padding: 18px 20px;
+            border-top: 1px solid #f0f0f0;
+            color: #555;
+            font-size: 15px;
+        }
+
+        tbody tr {
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        tbody tr:hover {
+            background: #fafafa;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-analyzed {
+            background: #cfe2ff;
+            color: #084298;
+        }
+
+        .status-completed {
+            background: #d1e7dd;
+            color: #0f5132;
+        }
+
+        .case-id {
+            font-family: 'Courier New', monospace;
+            color: #7a8f6a;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 60px;
+            color: #999;
+            font-size: 15px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            color: #999;
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        .detail-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 1000;
+            padding: 20px;
+            overflow-y: auto;
+            backdrop-filter: blur(4px);
+        }
+
+        .detail-modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .detail-content {
+            background: white;
+            border-radius: 8px;
+            padding: 40px;
+            max-width: 900px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 25px;
+            right: 25px;
+            background: #f5f5f5;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            color: #666;
+        }
+
+        .close-btn:hover {
+            background: #e8e8e8;
+            color: #333;
+        }
+
+        .detail-header {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #f5f5f5;
+        }
+
+        .detail-header h2 {
+            color: #1a2332;
+            margin-bottom: 8px;
+            font-size: 28px;
+            font-weight: 600;
+        }
+
+        .detail-header p {
+            color: #666;
+            font-size: 15px;
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .detail-field {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 6px;
+        }
+
+        .detail-label {
+            font-size: 11px;
+            color: #7a8f6a;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        .detail-value {
+            font-size: 18px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .photo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .photo-item {
+            position: relative;
+            border-radius: 6px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .photo-item:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .photo-item img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .photo-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(to bottom, transparent, rgba(0,0,0,0.7));
+            display: flex;
+            align-items: flex-end;
+            padding: 15px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .photo-item:hover .photo-overlay {
+            opacity: 1;
+        }
+
+        .photo-overlay-text {
+            color: white;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .detail-grid {
+                grid-template-columns: 1fr;
+            }
+
+            table {
+                font-size: 14px;
+            }
+
+            th, td {
+                padding: 12px 15px;
+            }
+
+            .detail-content {
+                padding: 30px 25px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-label">Case Management</div>
+            <h1>Dashboard</h1>
+            <p>Monitor and manage inspection cases</p>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number" id="totalCases">-</div>
+                <div class="stat-label">Total Cases</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="pendingCases">-</div>
+                <div class="stat-label">Pending</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="analyzedCases">-</div>
+                <div class="stat-label">Analyzed</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="completedCases">-</div>
+                <div class="stat-label">Completed</div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="filter-btn active" data-status="all">All Cases</button>
+            <button class="filter-btn" data-status="pending">Pending</button>
+            <button class="filter-btn" data-status="analyzed">Analyzed</button>
+            <button class="filter-btn" data-status="completed">Completed</button>
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Search by case ID or part family...">
+            </div>
+        </div>
+
+        <div class="cases-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Case ID</th>
+                        <th>Part Family</th>
+                        <th>Defect Type</th>
+                        <th>Status</th>
+                        <th>Created</th>
+                        <th>Photos</th>
+                    </tr>
+                </thead>
+                <tbody id="casesTableBody">
+                    <tr>
+                        <td colspan="6" class="loading">Loading cases...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="detail-modal" id="detailModal">
+        <div class="detail-content">
+            <button class="close-btn" onclick="closeDetail()">X</button>
+            <div class="detail-header">
+                <h2>Case Details</h2>
+                <p id="detailCaseId"></p>
+            </div>
+            <div id="detailBody"></div>
+        </div>
+    </div>
+
+    <script>
+        let allCases = [];
+        let currentFilter = 'all';
+
+        async function loadStatistics() {
+            try {
+                const response = await fetch('/api/cases/statistics/summary');
+                const stats = await response.json();
+                
+                document.getElementById('totalCases').textContent = stats.total || 0;
+                document.getElementById('pendingCases').textContent = stats.pending || 0;
+                document.getElementById('analyzedCases').textContent = stats.analyzed || 0;
+                document.getElementById('completedCases').textContent = stats.completed || 0;
+            } catch (error) {
+                console.error('Error loading statistics:', error);
+            }
+        }
+
+        async function loadCases(status = null) {
+            try {
+                const url = status && status !== 'all' 
+                    ? `/api/cases?status=${status}`
+                    : '/api/cases';
+                
+                const response = await fetch(url);
+                const data = await response.json();
+                allCases = data.cases;
+                
+                renderCases(allCases);
+            } catch (error) {
+                console.error('Error loading cases:', error);
+                document.getElementById('casesTableBody').innerHTML = `
+                    <tr>
+                        <td colspan="6" class="empty-state">
+                            <div class="empty-state-icon">!</div>
+                            <div>Error loading cases</div>
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+
+        function renderCases(cases) {
+            const tbody = document.getElementById('casesTableBody');
+            
+            if (cases.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="empty-state">
+                            <div class="empty-state-icon">-</div>
+                            <div>No cases found</div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = cases.map(caseData => `
+                <tr onclick="showDetail('${caseData.case_id}')">
+                    <td><span class="case-id">${caseData.case_id}</span></td>
+                    <td>${caseData.part_family}</td>
+                    <td>${caseData.defect_type}</td>
+                    <td><span class="status-badge status-${caseData.status}">${caseData.status}</span></td>
+                    <td>${formatDate(caseData.created_at)}</td>
+                    <td>${caseData.photo_count} photos</td>
+                </tr>
+            `).join('');
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return '-';
+            const date = new Date(dateString);
+            return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        }
+
+        async function showDetail(caseId) {
+            try {
+                const response = await fetch(`/api/cases/${caseId}`);
+                const caseData = await response.json();
+                
+                document.getElementById('detailCaseId').textContent = `Case ID: ${caseId}`;
+                document.getElementById('detailBody').innerHTML = `
+                    <div class="detail-grid">
+                        <div class="detail-field">
+                            <div class="detail-label">Part Family</div>
+                            <div class="detail-value">${caseData.part_family}</div>
+                        </div>
+                        <div class="detail-field">
+                            <div class="detail-label">Alloy</div>
+                            <div class="detail-value">${caseData.alloy}</div>
+                        </div>
+                        <div class="detail-field">
+                            <div class="detail-label">Defect Type</div>
+                            <div class="detail-value">${caseData.damage_type}</div>
+                        </div>
+                        <div class="detail-field">
+                            <div class="detail-label">Status</div>
+                            <div class="detail-value">
+                                <span class="status-badge status-${caseData.status}">${caseData.status}</span>
+                            </div>
+                        </div>
+                        <div class="detail-field">
+                            <div class="detail-label">Gap Estimate</div>
+                            <div class="detail-value">${caseData.gap_estimate} mm</div>
+                        </div>
+                        <div class="detail-field">
+                            <div class="detail-label">Length Estimate</div>
+                            <div class="detail-value">${caseData.length_estimate} mm</div>
+                        </div>
+                        <div class="detail-field">
+                            <div class="detail-label">Created At</div>
+                            <div class="detail-value">${formatDate(caseData.timestamp)}</div>
+                        </div>
+                        <div class="detail-field">
+                            <div class="detail-label">Photos</div>
+                            <div class="detail-value">${caseData.photo_paths.length} uploaded</div>
+                        </div>
+                    </div>
+                    <div style="margin-top: 30px;">
+                        <div class="detail-label" style="margin-bottom: 15px;">Photos with AI Detection</div>
+                        <div class="photo-grid">
+                            ${caseData.photo_paths.map((path, idx) => {
+                                const filename = path.split('/').pop();
+                                const caseId = caseData.submission_id;
+                                return `
+                                    <div class="photo-item" onclick="openPhotoViewer('${caseId}', '${filename}', ${idx}); event.stopPropagation();">
+                                        <img src="/uploads/${caseId}/${filename}" alt="Photo ${idx + 1}">
+                                        <div class="photo-overlay">
+                                            <div class="photo-overlay-text">VIEW WITH MASK</div>
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+                `;
+                
+                document.getElementById('detailModal').classList.add('active');
+            } catch (error) {
+                console.error('Error loading case details:', error);
+                alert('Failed to load case details');
+            }
+        }
+
+        function closeDetail() {
+            document.getElementById('detailModal').classList.remove('active');
+        }
+
+        function openPhotoViewer(caseId, filename, idx) {
+            window.open(`/photo-viewer?case=${caseId}&photo=${filename}&index=${idx}`, '_blank');
+        }
+
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                
+                const status = btn.dataset.status;
+                currentFilter = status;
+                loadCases(status);
+            });
+        });
+
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            const filtered = allCases.filter(c => 
+                c.case_id.toLowerCase().includes(searchTerm) ||
+                c.part_family.toLowerCase().includes(searchTerm) ||
+                c.defect_type.toLowerCase().includes(searchTerm)
+            );
+            renderCases(filtered);
+        });
+
+        document.getElementById('detailModal').addEventListener('click', (e) => {
+            if (e.target.id === 'detailModal') {
+                closeDetail();
+            }
+        });
+
+        loadStatistics();
+        loadCases();
+
+        setInterval(() => {
+            loadStatistics();
+            loadCases(currentFilter);
+        }, 30000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+{
+  "submission_id": "20251126_215507",
+  "timestamp": "2025-11-26T21:55:07.211231",
+  "part_family": "vane",
+  "alloy": "IN718",
+  "damage_type": "crack",
+  "gap_estimate": 34.0,
+  "length_estimate": 34.0,
+  "consent": true,
+  "photo_paths": [
+    "uploads/20251126_215507/photo_1_fea1f46e01e3fcc89d7173d778300a5c666b2b01.png",
+    "uploads/20251126_215507/photo_2_heroimg.webp",
+    "uploads/20251126_215507/photo_3_rome-clownpierce-23564370.png"
+  ]
+}

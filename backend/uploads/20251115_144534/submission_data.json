@@ -1,0 +1,15 @@
+{
+  "submission_id": "20251115_144534",
+  "timestamp": "2025-11-15T14:45:34.293314",
+  "part_family": "vane",
+  "alloy": "IN939",
+  "damage_type": "crack",
+  "gap_estimate": 34.0,
+  "length_estimate": 34.0,
+  "consent": true,
+  "photo_paths": [
+    "uploads/20251115_144534/photo_1_heroimg.webp",
+    "uploads/20251115_144534/photo_2_pancake-logo.png",
+    "uploads/20251115_144534/photo_3_image (6).png"
+  ]
+}
