@@ -20,26 +20,29 @@ class PhotoService:
         # Create upload directory if it doesn't exist
         os.makedirs(self.upload_dir, exist_ok=True)
 
-    async def validate_files(self, files: List[UploadFile]) -> None:
+    async def validate_files(self, files: List[UploadFile], test: bool = False) -> None:
         """
         Validate uploaded files against photo upload specifications.
         
         Validation Rules:
-        - File count: 3 minimum, 6 maximum
+        - File count: 3 minimum (1 minimum if test=True), 6 maximum
         - File types: image/jpeg, image/png only
         - File size: 10MB maximum per file
         
         Args:
             files: List of uploaded files to validate
+            test: If True, minimum file count is 1 instead of 3
             
         Raises:
             HTTPException: 400 if files violate any validation rules
         """
 
         # Check number of files
-        if len(files) < 3 or len(files) > 6:
+        min_files = 1 if test else 3
+        if len(files) < min_files or len(files) > 6:
             raise HTTPException(
-                status_code=400, detail="You must upload between 3 and 6 images"
+                status_code=400, 
+                detail=f"You must upload between {min_files} and 6 images"
             )
 
         # Check file types
