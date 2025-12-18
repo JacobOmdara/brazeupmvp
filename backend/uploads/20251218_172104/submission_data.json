@@ -1,0 +1,15 @@
+{
+  "submission_id": "20251218_172104",
+  "timestamp": "2025-12-18T17:21:04.287906",
+  "part_family": "vane",
+  "alloy": "IN625",
+  "damage_type": "pit",
+  "gap_estimate": "77cm",
+  "length_estimate": "77mm",
+  "consent": true,
+  "photo_paths": [
+    "uploads/20251218_172104/photo_1_IMG_8418.webp",
+    "uploads/20251218_172104/photo_2_square-crop.png",
+    "uploads/20251218_172104/photo_3_heroimg.webp"
+  ]
+}

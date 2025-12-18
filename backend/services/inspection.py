@@ -56,8 +56,8 @@ class InspectionService:
         part_family: str,
         alloy: str,
         damage_type: str,
-        gap_estimate: float,
-        length_estimate: float,
+        gap_estimate: str,  # Changed from float to str
+        length_estimate: str,  # Changed from float to str
         consent: bool,
         photo_paths: List[str]
     ) -> dict:
@@ -88,8 +88,8 @@ class InspectionService:
         part_family: str,
         alloy: str,
         damage_type: str,
-        gap_estimate: float,
-        length_estimate: float,
+        gap_estimate: str,
+        length_estimate: str,
         consent: bool,
         photos: List[UploadFile]
     ) -> dict:

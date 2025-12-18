@@ -15,8 +15,8 @@ async def submit_inspection(
     part_family: str = Form(...),
     alloy: str = Form(...),
     damage_type: str = Form(...),
-    gap_estimate: float = Form(...),
-    length_estimate: float = Form(...),
+    gap_estimate: str = Form(...),  # Changed from float to str
+    length_estimate: str = Form(...),  # Changed from float to str
     consent: bool = Form(...),
     photos: List[UploadFile] = File(...),
 ):

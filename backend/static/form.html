@@ -523,14 +523,28 @@
                     </div>
 
                     <div class="form-group">
-                        <label>Gap Estimate (mm) <span class="required">*</span></label>
-                        <input type="number" id="gapEstimate" name="gap_estimate" min="0" step="0.01" placeholder="Enter gap measurement" required>
+                        <label>Gap Estimate <span class="required">*</span></label>
+                        <div style="display: flex; gap: 10px;">
+                            <input type="number" id="gapEstimate" name="gap_estimate" min="0" step="0.01" placeholder="Enter gap measurement" required style="flex: 2;">
+                            <select id="gapUnit" name="gap_unit" required style="flex: 1;">
+                                <option value="mm" selected>mm</option>
+                                <option value="cm">cm</option>
+                                <option value="in">in</option>
+                            </select>
+                        </div>
                         <div class="error-message" id="gapError">Please enter a valid gap estimate</div>
                     </div>
 
                     <div class="form-group">
-                        <label>Length Estimate (mm) <span class="required">*</span></label>
-                        <input type="number" id="lengthEstimate" name="length_estimate" min="0" step="0.01" placeholder="Enter length measurement" required>
+                        <label>Length Estimate <span class="required">*</span></label>
+                        <div style="display: flex; gap: 10px;">
+                            <input type="number" id="lengthEstimate" name="length_estimate" min="0" step="0.01" placeholder="Enter length measurement" required style="flex: 2;">
+                            <select id="lengthUnit" name="length_unit" required style="flex: 1;">
+                                <option value="mm" selected>mm</option>
+                                <option value="cm">cm</option>
+                                <option value="in">in</option>
+                            </select>
+                        </div>
                         <div class="error-message" id="lengthError">Please enter a valid length estimate</div>
                     </div>
 
@@ -775,8 +789,8 @@
             formData.append('part_family', document.getElementById('partFamily').value);
             formData.append('alloy', document.getElementById('alloy').value);
             formData.append('damage_type', document.querySelector('input[name="damage_type"]:checked').value);
-            formData.append('gap_estimate', document.getElementById('gapEstimate').value);
-            formData.append('length_estimate', document.getElementById('lengthEstimate').value);
+            formData.append('gap_estimate', document.getElementById('gapEstimate').value + document.getElementById('gapUnit').value);
+            formData.append('length_estimate', document.getElementById('lengthEstimate').value + document.getElementById('lengthUnit').value);
             formData.append('consent', document.getElementById('consent').checked);
 
             uploadedPhotos.forEach(photo => {
