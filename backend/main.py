@@ -31,8 +31,6 @@ async def health():
     return {"message": "Status OK!"}
 
 # Include routers
-app.include_router(qa_pack.router, prefix="/api/v1", tags=["QA-pack ZIP Bundler"])
-app.include_router(photo_upload.router, prefix="/api/v1", tags=["upload"])
 app.include_router(inspection.router, prefix="/api", tags=["inspection"])
 app.include_router(case_management.router, prefix="/api", tags=["cases"])
 app.include_router(static_routes.router, tags=["static"])
