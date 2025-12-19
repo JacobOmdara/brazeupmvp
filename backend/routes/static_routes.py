@@ -5,8 +5,16 @@ router = APIRouter()
 
 
 @router.get("/", response_class=HTMLResponse)
-async def serve_form():
-    return"<h1>homepg</p>"
+async def serve_home():
+    """Serve the inspection form as homepage"""
+    try:
+        with open("static/form.html", "r") as f:
+            return f.read()
+    except FileNotFoundError:
+        return HTMLResponse(
+            content="<h1>Welcome to Tapestic</h1><p><a href='/form'>Go to Form</a> | <a href='/dashboard'>Go to Dashboard</a></p>",
+            status_code=200
+        )
 
 @router.get("/form", response_class=HTMLResponse)
 async def serve_form():

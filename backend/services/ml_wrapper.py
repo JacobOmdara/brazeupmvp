@@ -24,32 +24,49 @@ DEVICE = torch.device(
 )  # using gpu otherwise use cpu
 
 
+MODEL_IS_REAL = False  # Track if we have real trained weights
+
 def load_model():  # getting model HuggingFace
-    global MODEL
+    global MODEL, MODEL_IS_REAL
     if MODEL is None:
         try:
             # Try to download from HF (Awais's repo)
+            print("Attempting to download model from Awais-H/MetalSegmentation...")
             model_path = hf_hub_download(
                 repo_id="Awais-H/MetalSegmentation", filename="best_model.pth"
             )
+            print(f"Model downloaded to: {model_path}")
+            
             checkpoint = torch.load(model_path, map_location=DEVICE, weights_only=False)
+            print(f"Checkpoint type: {type(checkpoint)}")
+            if isinstance(checkpoint, dict):
+                print(f"Checkpoint keys: {checkpoint.keys()}")
+            
             MODEL = UNet(
                 in_channels=3,
                 out_channels=7,
                 base_filters=64,
                 depth=4,
             )
+            
             if isinstance(checkpoint, dict) and "model_state_dict" in checkpoint:
                 MODEL.load_state_dict(checkpoint["model_state_dict"])
+                print("Loaded model_state_dict from checkpoint")
             else:
                 MODEL.load_state_dict(checkpoint)
+                print("Loaded checkpoint directly as state_dict")
+                
             MODEL.to(DEVICE)
             MODEL.eval()
-            print(f"Model loaded from HuggingFace on {DEVICE}")
+            MODEL_IS_REAL = True
+            print(f"SUCCESS: Real model loaded from HuggingFace on {DEVICE}")
 
         except Exception as e:
             # Fallback: create a MOCK model for testing
-            print(f"HF download failed ({e}), using mock model for testing")
+            import traceback
+            print(f"ERROR: HF download failed: {e}")
+            print(traceback.format_exc())
+            print("WARNING: Using MOCK model - predictions will be random!")
             MODEL = UNet(
                 in_channels=3,
                 out_channels=7,
@@ -58,6 +75,7 @@ def load_model():  # getting model HuggingFace
             )
             MODEL.to(DEVICE)
             MODEL.eval()
+            MODEL_IS_REAL = False
             print(f"Mock model created on {DEVICE}")
 
 
@@ -97,6 +115,13 @@ def predict_defects(image_bytes):  #
         
         # Get confidence (max probability) per pixel
         confidence_map = probabilities.max(dim=0)[0].cpu().numpy()  # Shape: (256, 256)
+        
+        # Debug: Log prediction statistics
+        unique, counts = np.unique(prediction, return_counts=True)
+        class_distribution = dict(zip([DEFECT_CLASSES.get(int(u), f"unknown_{u}") for u in unique], counts.tolist()))
+        print(f"Prediction stats - Using real model: {MODEL_IS_REAL}")
+        print(f"Class distribution: {class_distribution}")
+        print(f"Total pixels: {prediction.size}, Non-background: {(prediction > 0).sum()}")
 
     # Convert segmentation mask to defect detections with true confidence
     defects = process_segmentation_mask(prediction, confidence_map, original_size)
