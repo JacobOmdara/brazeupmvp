@@ -1,0 +1,21 @@
+# Production dependencies (CPU-only PyTorch - smaller image)
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+python-multipart==0.0.6
+aiofiles==23.2.1
+
+# PyTorch CPU-only (much smaller than full torch)
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch==2.1.0+cpu
+torchvision==0.16.0+cpu
+
+# Image processing
+Pillow==10.1.0
+numpy==1.26.0
+scipy==1.11.4
+
+# Model loading
+huggingface-hub==0.19.0
+
+# Environment
+python-dotenv==1.0.0

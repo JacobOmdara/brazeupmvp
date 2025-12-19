@@ -1,0 +1,39 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.pytest_cache/
+*.egg-info/
+.eggs/
+
+# Virtual environments
+venv/
+env/
+.venv/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Git
+.git/
+.gitignore
+
+# Testing
+tests/__pycache__/
+.coverage
+htmlcov/
+
+# Local uploads (will be created at runtime)
+uploads/
+storage/uploads/
+
+# Misc
+*.log
+.env.local
+.DS_Store
+Thumbs.db
