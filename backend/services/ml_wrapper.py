@@ -3,7 +3,7 @@ import numpy as np
 from PIL import Image
 from huggingface_hub import hf_hub_download
 import io
-from backend.model import UNet
+from model import UNet
 # utilizing pytorch (what Awais used) n downloading models from HuggingFace
 
 MODEL = None  # placeholder for model

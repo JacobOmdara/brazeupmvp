@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  brazeup-api:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      # Persist uploads between restarts
+      - uploads_data:/app/uploads
+      - storage_data:/app/storage/uploads
+    environment:
+      - PYTHONUNBUFFERED=1
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+volumes:
+  uploads_data:
+  storage_data:

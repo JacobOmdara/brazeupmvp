@@ -1,0 +1,15 @@
+{
+  "submission_id": "20251219_112954",
+  "timestamp": "2025-12-19T11:29:54.018308",
+  "part_family": "H",
+  "alloy": "A356",
+  "damage_type": "crack",
+  "gap_estimate": "1mm",
+  "length_estimate": "20mm",
+  "consent": true,
+  "photo_paths": [
+    "uploads/20251219_112954/photo_1_test1.jpg",
+    "uploads/20251219_112954/photo_2_test2.jpg",
+    "uploads/20251219_112954/photo_3_test3.jpg"
+  ]
+}
