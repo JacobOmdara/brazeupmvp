@@ -68,7 +68,7 @@ def predict_defects(image_bytes):  #
     Arguments:
         image_bytes: raw bytes of uploaded img
     Returns:
-        List of detected defects w bounding boxes
+        List of detected defects w bounding boxes and true model confidence
     """
     load_model()
 
@@ -85,26 +85,35 @@ def predict_defects(image_bytes):  #
     image_tensor = torch.from_numpy(image_array).permute(2, 0, 1).unsqueeze(0)
     image_tensor = image_tensor.to(DEVICE)
 
-    # run model inference (uncomment when model architecture ready)
+    # run model inference
     with torch.no_grad():
         output = MODEL(image_tensor)
+        
+        # Apply softmax to get true probabilities
+        probabilities = torch.softmax(output, dim=1)[0]  # Shape: (7, 256, 256)
+        
+        # Get predicted class per pixel
         prediction = torch.argmax(output, dim=1)[0].cpu().numpy()
+        
+        # Get confidence (max probability) per pixel
+        confidence_map = probabilities.max(dim=0)[0].cpu().numpy()  # Shape: (256, 256)
 
-    # Convert segmentation mask to defect detections
-    defects = process_segmentation_mask(prediction, original_size)
+    # Convert segmentation mask to defect detections with true confidence
+    defects = process_segmentation_mask(prediction, confidence_map, original_size)
 
     return defects
 
 
-def process_segmentation_mask(mask, original_size):
+def process_segmentation_mask(mask, confidence_map, original_size):
     """
-    Convert segmentation mask to list of defects with bounding boxes
+    Convert segmentation mask to list of defects with bounding boxes and true model confidence
 
     Arguments:
         mask: numpy array of shape (256, 256) with class predictions
+        confidence_map: numpy array of shape (256, 256) with softmax probabilities
         original_size: tuple (width, height) of original image
     Returns:
-        List of detected defects
+        List of detected defects with true model confidence scores
     """
     from scipy import ndimage
 
@@ -129,12 +138,13 @@ def process_segmentation_mask(mask, original_size):
                 int(rows.max() * scale_y),
             ]
 
-            area = (rows.max() - rows.min() + 1) * (cols.max() - cols.min() + 1)
+            # Calculate TRUE model confidence: average softmax probability for this region
+            region_confidence = float(confidence_map[component].mean())
 
             defects.append(
                 {
                     "type": DEFECT_CLASSES[class_id],
-                    "confidence": float(component.sum() / area),
+                    "confidence": round(region_confidence * 100, 1),  # As percentage
                     "bounding_box": bbox,
                 }
             )

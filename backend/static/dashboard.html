@@ -15,6 +15,46 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
             background: #fafafa;
             min-height: 100vh;
+            padding: 0;
+        }
+
+        .top-nav {
+            background: #f5f5f5;
+            padding: 15px 40px;
+            display: flex;
+            gap: 30px;
+            align-items: center;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .top-nav a {
+            color: #555;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            padding: 8px 16px;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .top-nav a:hover {
+            background: #7a8f6a;
+            color: white;
+        }
+
+        .top-nav a.active {
+            background: #7a8f6a;
+            color: white;
+        }
+
+        .top-nav .brand {
+            font-size: 36px;
+            font-weight: 600;
+            color: #1a2332;
+            margin-right: auto;
+        }
+
+        .main-content {
             padding: 20px;
         }
 
@@ -413,6 +453,13 @@
     </style>
 </head>
 <body>
+    <nav class="top-nav">
+        <span class="brand">Tapestic</span>
+        <a href="/form">Inspection Form</a>
+        <a href="/dashboard" class="active">Dashboard</a>
+        <a href="/docs" target="_blank">API Docs</a>
+    </nav>
+    <div class="main-content">
     <div class="container">
         <div class="header">
             <div class="header-label">Case Management</div>
@@ -599,6 +646,46 @@
                             <div class="detail-value">${caseData.photo_paths.length} uploaded</div>
                         </div>
                     </div>
+                    ${caseData.analysis_results ? `
+                    <div style="margin-top: 30px; background: #f0f7f0; padding: 25px; border-radius: 8px; border-left: 4px solid #7a8f6a;">
+                        <div class="detail-label" style="margin-bottom: 15px; color: #7a8f6a;">AI ANALYSIS RESULTS</div>
+                        <div style="display: flex; gap: 20px; align-items: stretch; flex-wrap: wrap;">
+                            <div style="background: white; padding: 25px 40px; border-radius: 8px; text-align: center; flex: 1; min-width: 200px;">
+                                <div style="font-size: 14px; color: #666; text-transform: uppercase; margin-bottom: 8px;">Primary Defect Detected</div>
+                                <div style="font-size: 28px; font-weight: 700; color: #e67e22; text-transform: uppercase;">${(caseData.analysis_results.primary_defect || 'None').replace('_', ' ')}</div>
+                                ${caseData.analysis_results.confidence ? `
+                                <div style="font-size: 14px; color: #7a8f6a; margin-top: 8px;">${caseData.analysis_results.confidence}% confidence</div>
+                                ` : ''}
+                                ${caseData.analysis_results.recommended_solution?.severity ? `
+                                <div style="margin-top: 12px; display: inline-block; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600; background: ${caseData.analysis_results.recommended_solution.severity === 'High' ? '#f8d7da' : caseData.analysis_results.recommended_solution.severity === 'Low' ? '#d1e7dd' : '#fff3cd'}; color: ${caseData.analysis_results.recommended_solution.severity === 'High' ? '#721c24' : caseData.analysis_results.recommended_solution.severity === 'Low' ? '#0f5132' : '#856404'};">
+                                    ${caseData.analysis_results.recommended_solution.severity} Severity
+                                </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                        
+                        ${caseData.analysis_results.recommended_solution?.solutions ? `
+                        <div style="margin-top: 20px; background: white; padding: 20px; border-radius: 8px;">
+                            <div style="font-size: 14px; font-weight: 600; color: #1a2332; margin-bottom: 8px;">Recommended Solutions</div>
+                            <div style="font-size: 13px; color: #666; margin-bottom: 15px;">${caseData.analysis_results.recommended_solution.description || ''}</div>
+                            <div style="display: grid; gap: 10px;">
+                                ${caseData.analysis_results.recommended_solution.solutions.map((sol, idx) => `
+                                    <div style="display: flex; align-items: center; gap: 12px; padding: 12px 15px; background: #f9f9f9; border-radius: 6px;">
+                                        <span style="background: #7a8f6a; color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600;">${idx + 1}</span>
+                                        <span style="font-size: 14px; color: #333;">${sol}</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                            ${caseData.analysis_results.recommended_solution.estimated_repair_time ? `
+                            <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #eee; display: flex; justify-content: space-between; align-items: center;">
+                                <span style="font-size: 13px; color: #666;">Estimated Repair Time</span>
+                                <span style="font-size: 14px; font-weight: 600; color: #7a8f6a;">${caseData.analysis_results.recommended_solution.estimated_repair_time}</span>
+                            </div>
+                            ` : ''}
+                        </div>
+                        ` : ''}
+                    </div>
+                    ` : ''}
                     <div style="margin-top: 30px;">
                         <div class="detail-label" style="margin-bottom: 15px;">Photos with AI Detection</div>
                         <div class="photo-grid">
@@ -668,5 +755,6 @@
             loadCases(currentFilter);
         }, 30000);
     </script>
+    </div>
 </body>
 </html>
