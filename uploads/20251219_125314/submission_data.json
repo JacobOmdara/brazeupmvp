@@ -1,0 +1,15 @@
+{
+  "submission_id": "20251219_125314",
+  "timestamp": "2025-12-19T12:53:14.595458",
+  "part_family": "H",
+  "alloy": "jh",
+  "damage_type": "jgh",
+  "gap_estimate": "1mm",
+  "length_estimate": "20mm",
+  "consent": true,
+  "photo_paths": [
+    "uploads/20251219_125314/photo_1_img1.jpg",
+    "uploads/20251219_125314/photo_2_img2.jpg",
+    "uploads/20251219_125314/photo_3_img3.jpg"
+  ]
+}
